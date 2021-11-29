@@ -2,8 +2,9 @@ pragma solidity >=0.8.10 <0.9.0;
 
 contract LockerManagerV1 {
     mapping(string => address) lockerAddressMap;
-    event lockerOpened(bytes indexed _lockerId);
-    event lockerClosed(bytes indexed _lockerId, address _owner);
+
+    event lockerOpened(bytes indexed _lockerId, address indexed _owner);
+    event lockerClosed(bytes indexed _lockerId, address indexed _owner);
 
 
     function closeLocker(string memory _id) public {
@@ -15,8 +16,8 @@ contract LockerManagerV1 {
     function openLocker(string memory _id) public {
         require(lockerAddressMap[_id] == msg.sender, "Locker doesn't belong to address");
         delete lockerAddressMap[_id];
-        emit lockerOpened(abi.encode(_id));
-      }
+        emit lockerOpened(abi.encode(_id), msg.sender);
+    }
 
     function isLockerClosed(string memory _id) view public returns (bool){
         return lockerAddressMap[_id] != address(0);
