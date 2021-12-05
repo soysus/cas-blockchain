@@ -1,23 +1,24 @@
-const LockerManager = artifacts.require('LockerManagerV1');
+const LockerManager = artifacts.require('LockerManagerV2Core');
 const truffleAssert = require('truffle-assertions');
 
-contract('LockerManagerV1', (accounts) => {
+contract('LockerManagerV2Core', (accounts) => {
    let manager;
-   const LOCKER_1_ID = '1';
-   const LOCKER_2_ID = '2';
+   const LOCKER_1_ID = web3.utils.utf8ToHex('1');
+   const LOCKER_2_ID = web3.utils.utf8ToHex('2');
+   const LOCKER_3_ID = web3.utils.utf8ToHex('3');
 
    before(() => {
       return LockerManager.deployed().then((contract) => (manager = contract));
    });
 
-   describe('the locker is free', () => {
+   describe('V2Core: the locker is free', () => {
       it('can be locked', () => {
          return manager
             .closeLocker(LOCKER_1_ID, { from: accounts[0] })
             .then(async (result) => {
                assert.isTrue(await manager.isLockerClosed(LOCKER_1_ID));
                truffleAssert.eventEmitted(result, 'lockerClosed', (ev) => {
-                  return ev.owner === accounts[0];
+                  return ev.closer === accounts[0];
                });
                assert.equal(result.logs.length, 1);
             });
@@ -28,7 +29,7 @@ contract('LockerManagerV1', (accounts) => {
             .then(async (result) => {
                assert.isTrue(await manager.isLockerClosed(LOCKER_2_ID));
                truffleAssert.eventEmitted(result, 'lockerClosed', (ev) => {
-                  return ev.owner === accounts[0];
+                  return ev.closer === accounts[0];
                });
                assert.equal(result.logs.length, 1);
             });
@@ -36,7 +37,7 @@ contract('LockerManagerV1', (accounts) => {
    });
 
    //locker1 and locker2 are closed in the previous tests
-   describe('the locker is closed', () => {
+   describe('V2Core: the locker is closed', () => {
       it('cannot close twice the same compartment', () => {
          return manager
             .closeLocker(LOCKER_1_ID, { from: accounts[0] })
@@ -69,7 +70,7 @@ contract('LockerManagerV1', (accounts) => {
       });
       it('cannot open another compartment ', () => {
          return manager
-            .openLocker('xyz', { from: accounts[0] })
+            .openLocker(LOCKER_3_ID, { from: accounts[0] })
             .then(() => {
                throw new Error('this test shall fail!');
             })
