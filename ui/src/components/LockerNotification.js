@@ -50,7 +50,7 @@ class LockerAction extends React.Component {
 
    componentDidMount() {
       this.lockerManager.events.lockerClosed(
-         { fromBlock: 'latest', filter: { _account: this.account } },
+         { fromBlock: 'latest', filter: { owner: this.account } },
          (error, event) => {
             this.setState({ eventType: EventType.Closed });
             if (error) {
@@ -63,7 +63,7 @@ class LockerAction extends React.Component {
       this.lockerManager.events.lockerOpened(
          {
             fromBlock: 'latest',
-            filter: { _account: this.account },
+            filter: { owner: this.account },
          },
          (error, event) => {
             this.setState({ eventType: EventType.Opened });
