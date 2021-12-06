@@ -207,4 +207,25 @@ contract('LockerManagerV2', (accounts) => {
             });
       });
    });
+   describe('V2: price', () => {
+      it('can be changed by owner ', () => {
+         const newPricePerBlock = web3.utils.toWei('1', 'milli');
+         return manager
+            .setCurrentPricePerBlock(newPricePerBlock, { from: OWNER_ADDRESS })
+            .then(async () => {
+               assert.equal(newPricePerBlock, await manager.getCurrentPricePerBlock());
+            });
+      });
+      it('cannot be changed by others ', () => {
+         const newPricePerBlock = web3.utils.toWei('1', 'micro');
+         return manager
+             .setCurrentPricePerBlock(newPricePerBlock, { from: NON_OWNER_ADDRESS_1 })
+             .then(async () => {
+                throw new Error('this test shall fail!');
+             })
+             .catch((error) => {
+                assert.equal(error.reason, 'Ownable: caller is not the owner');
+             });
+      });
+   });
 });

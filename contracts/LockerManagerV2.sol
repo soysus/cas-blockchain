@@ -52,11 +52,12 @@ contract LockerManagerV2 is LockerManagerV2Payable {
         lockerState[_id].allowedOpener = _to;
     }
 
-    //checks the whether a locker is closed
+    //checks whether a locker is closed
     function isLockerFree(bytes16 _id) view public virtual returns (bool){
         return lockerState[_id].allowedOpener == address(0) || lockerState[_id].lockedUntilBlock < block.number;
     }
 
+    //checks the amount of blocks remaining before expiration
     function getRemainingBlocks(bytes16 _id) view public returns (uint){
         if (lockerState[_id].lockedUntilBlock > block.number) {
             return lockerState[_id].lockedUntilBlock - block.number;
